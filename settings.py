@@ -1,0 +1,1 @@
+MINECRAFT_SERVER = "mc.hypixel.net"
