@@ -60,7 +60,7 @@ class Console(commands.Cog):
 
         if message.channel == self.whitelist_channel:
             api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
-            message.channel.send("`{mmessage.content}` a été ajouté à la whitelist")
+            await message.channel.send("`{mmessage.content}` a été ajouté à la whitelist")
 
         if message.author == self.bot.user and message.channel.id!=CHANNEL:
             return
