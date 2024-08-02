@@ -17,13 +17,17 @@ load_dotenv()
 
 #Load admins
 with open("cadmins.json","r") as e:
-     cadmins = json.load(e)
+     json_cadmins = json.load(e)
+     cadmins = json_cadmins["cadmins"]
+     
+# cadmins = [1014794468051918888]
 
 with open("emojis.json","r") as f:
      emojis = json.load(f)
 
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
 CHANNEL = int(os.getenv("CONSOLE-CHANNEL"))
+WHITELIST_CHANNEL = int(os.getenv("WHITELIST_CHANNEL"))
 
 class Console(commands.Cog):
     def __init__(self, bot):
@@ -43,6 +47,31 @@ class Console(commands.Cog):
         if self.channel is None:
             print(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
+        
+        self.whitelist_channel = self.guild.get_channel(WHITELIST_CHANNEL)
+        if self.channel is None:
+            print(f"Channel with ID {WHITELIST_CHANNEL} not found in guild {DISCORD_SERVER}.")
+            return
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        global cadmins
+        global api
+
+        if message.channel == self.whitelist_channel:
+            api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
+            message.channel.send("`{mmessage.content}` a été ajouté à la whitelist")
+
+        if message.author == self.bot.user and message.channel.id!=CHANNEL:
+            return
+        content = message.content
+        if content.startswith("."):
+            if message.author.id in cadmins:
+                command = content[1:]
+                await message.channel.send(f"Command sent: `{command}`")
+                api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=command)
+            else:
+                await message.channel.send(f"Tu n'as pas les permissions pour accéder à la console!")
 
     @tasks.loop(seconds=10)
     async def check_console(self):
@@ -51,7 +80,8 @@ class Console(commands.Cog):
             response = api.client.servers.files.get_file_contents(server_id=os.getenv("PTERODACTYL-SERVER"), path="logs/latest.log")
             res_str = response.text
             res_list = res_str.split('\n')
-            res_list.pop()
+            if len(res_list)>5:
+                res_list.pop()
         except Exception as e:
             print(f"Error fetching file contents: {e}")
 
