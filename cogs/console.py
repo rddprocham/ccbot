@@ -57,12 +57,14 @@ class Console(commands.Cog):
     async def on_message(self, message):
         global cadmins
         global api
+        if message.author == self.bot.user:
+            return
 
         if message.channel == self.whitelist_channel:
             api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
             await message.channel.send("`{mmessage.content}` a été ajouté à la whitelist")
 
-        if message.author == self.bot.user and message.channel.id!=CHANNEL:
+        if message.channel.id!=CHANNEL:
             return
         content = message.content
         if content.startswith("."):
