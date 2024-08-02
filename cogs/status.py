@@ -66,7 +66,7 @@ class Status(commands.Cog):
     def cog_unload(self):
         self.send_message.cancel()
 
-    @tasks.loop(seconds=7)
+    @tasks.loop(seconds=20)
     async def send_message(self):
         await asyncio.sleep(3)
         try:
