@@ -17,7 +17,7 @@ with open("emojis.json","r") as f:
      emojis = json.load(f)
 
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
-CHANNEL = int(os.getenv("CHANNEL"))
+CHANNEL = int(os.getenv("STATUS-CHANNEL"))
 ADMIN_CHANNEL = int(os.getenv("ADMIN_CHANNEL"))
 
 import asyncio
@@ -59,7 +59,7 @@ class Status(commands.Cog):
         except:
            self.msg = await channel.send(embed=embed)
         
-        print("Message sent and stored successfully.")
+        print("Message stored successfully.")
 
 
 
