@@ -78,6 +78,9 @@ class Status(commands.Cog):
                     embed.add_field(name="IP",
                                     value=MINECRAFT_SERVER,
                                     inline=False)
+                    embed.add_field(name="Version",
+                                    value=status.version,
+                                    inline=False)
                     
                     embed.add_field(name="Statut",
                                     value=f"En ligne {emojis["done"]}",
