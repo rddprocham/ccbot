@@ -11,6 +11,8 @@ api = PterodactylClient(os.getenv("PTERODACTYL-PANEL"), os.getenv("PTERODACTYL-K
 import os
 import json
 
+import asyncio
+
 
 #Load env variables
 load_dotenv()
@@ -69,12 +71,15 @@ class Console(commands.Cog):
             return
 
         if message.channel == self.whitelist_channel:
-            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
+            api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
             await message.channel.send(f"`{message.content}` a été ajouté à la whitelist")
             async for msg in self.usernames_channel.history():
                 if msg.content == message.content:
                     dm = await msg.author.create_dm()
                     await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Promise!\n-# Vous n'êtes pas {message.content}? Veuillez signaler ce problème au staff")
+            
+            asyncio.sleep(3)
+            api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist reload")
 
         if message.channel.id!=CHANNEL:
             return
@@ -119,7 +124,7 @@ class Console(commands.Cog):
             if not self.first_run and changed_lines:
                 print(f"Number of changed lines: {len(changed_lines)}")
                 for index, line in changed_lines:
-                    print(f"Line {index + 1}: {line}")
+                    # print(f"Line {index + 1}: {line}")
                     try:
                         await self.channel.send(f"`{line}`")
                     except:
