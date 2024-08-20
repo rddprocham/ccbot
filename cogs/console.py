@@ -19,8 +19,9 @@ load_dotenv()
 with open("cadmins.json","r") as e:
      json_cadmins = json.load(e)
      cadmins = json_cadmins["cadmins"]
-     
-# cadmins = [1014794468051918888]
+     cloweradmins = json_cadmins["cloweradmins"]
+     clowerauth = json_cadmins["clowerauth"]
+
 
 with open("emojis.json","r") as f:
      emojis = json.load(f)
@@ -28,6 +29,7 @@ with open("emojis.json","r") as f:
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
 CHANNEL = int(os.getenv("CONSOLE-CHANNEL"))
 WHITELIST_CHANNEL = int(os.getenv("WHITELIST_CHANNEL"))
+USERNAMES_CHANNEL = int(os.getenv("USERNAMES_CHANNEL"))
 
 class Console(commands.Cog):
     def __init__(self, bot):
@@ -52,6 +54,12 @@ class Console(commands.Cog):
         if self.channel is None:
             print(f"Channel with ID {WHITELIST_CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
+        
+        self.usernames_channel = self.guild.get_channel(USERNAMES_CHANNEL)
+        if self.channel is None:
+            print(f"Channel with ID {USERNAMES_CHANNEL} not found in guild {DISCORD_SERVER}.")
+            return
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -61,21 +69,30 @@ class Console(commands.Cog):
             return
 
         if message.channel == self.whitelist_channel:
-            api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
+            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
             await message.channel.send(f"`{message.content}` a été ajouté à la whitelist")
+            async for msg in self.usernames_channel.history():
+                if msg.content == message.content:
+                    dm = await msg.author.create_dm()
+                    await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Promise!\n-# Vous n'êtes pas {message.content}? Veuillez signaler ce problème au staff")
 
         if message.channel.id!=CHANNEL:
             return
         content = message.content
         if content.startswith("."):
-            if message.author.id in cadmins:
+            if message.author.id in cloweradmins:
                 command = content[1:]
-                await message.channel.send(f"Command sent: `{command}`")
+                if command.startswith(tuple(clowerauth)):
+                    await message.channel.send(f"Commande envoyée: `{command}`")
+                    api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=command)
+            elif message.author.id in cadmins:
+                command = content[1:]
+                await message.channel.send(f"Commande envoyée: `{command}`")
                 api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=command)
             else:
                 await message.channel.send(f"Tu n'as pas les permissions pour accéder à la console!")
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=5)
     async def check_console(self):
         global api
         try:
@@ -103,7 +120,10 @@ class Console(commands.Cog):
                 print(f"Number of changed lines: {len(changed_lines)}")
                 for index, line in changed_lines:
                     print(f"Line {index + 1}: {line}")
-                    await self.channel.send(f"`{line}`")
+                    try:
+                        await self.channel.send(f"`{line}`")
+                    except:
+                        pass
 
             self.previous_lines = current_lines
             self.first_run = False  # Set the flag to False after the first run

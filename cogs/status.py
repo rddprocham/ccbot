@@ -87,6 +87,9 @@ class Status(commands.Cog):
                                     inline=False)
                     embed.add_field(name="Nombre de joueurs",
                                     value=f"{status.players.online}",
+                                    inline=False),
+                    embed.add_field(name="Version",
+                                    value="1.20.6",
                                     inline=False)
 
 
