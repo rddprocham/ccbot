@@ -57,7 +57,7 @@ class Status(commands.Cog):
             if self.msg is None:  # No messages in the channel
                 raise discord.NotFound
         except:
-           self.msg = await channel.send(embed=embed)
+            self.msg = await channel.send(embed=embed)
         
         print("Message stored successfully.")
 
@@ -78,7 +78,6 @@ class Status(commands.Cog):
                     embed.add_field(name="IP",
                                     value=MINECRAFT_SERVER,
                                     inline=False)
-                    
                     embed.add_field(name="Statut",
                                     value=f"En ligne {emojis["done"]}",
                                     inline=False)
@@ -120,7 +119,7 @@ class Status(commands.Cog):
             if channel is None:
                 print(f"Channel with ID {ADMIN_CHANNEL} not found in guild {DISCORD_SERVER}.")
                 return
-            await channel.send(f"{emojis["failed"]} Il semblerait que le serveur soit hors-ligne! ||{os.getenv("ADMIN_ROLE_TO_PING")}||")
+            #await channel.send(f"{emojis["failed"]} Il semblerait que le serveur soit hors-ligne! ||{os.getenv("ADMIN_ROLE_TO_PING")}||")
 
     @send_message.before_loop
     @check_threshold.before_loop
