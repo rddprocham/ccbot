@@ -77,7 +77,7 @@ class Graphs(commands.Cog):
         channel = self.bot.get_channel(CHANNEL)
         self.graph_message_60s = await channel.send(file=discord.File('plot_60min.png'))
     
-    @tasks.loop(seconds=3)
+    @tasks.loop(seconds=3600)
     async def hour(self):
         graphs("1h", 24, "24 heures", "Heures")
         if self.graph_message_1h:
