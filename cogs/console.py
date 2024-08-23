@@ -95,7 +95,7 @@ class Console(commands.Cog):
                 await message.channel.send(f"Commande envoyée: `{command}`")
                 api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=command)
             else:
-                await message.channel.send(f"Tu n'as pas les permissions pour accéder à la console!")
+                await message.channel.send(f"Tu n'as pas les permissions pour accéder à la console!)")
 
     @tasks.loop(seconds=5)
     async def check_console(self):
