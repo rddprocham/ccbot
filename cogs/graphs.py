@@ -26,6 +26,7 @@ def graphs(time_str, time_int, time_description, time_unit):
                 for i in range(60):
                     temp += data["60min"][i]
                 temp /= 60
+                temp = round(temp)
                 last_mins.append(temp)
                 print(temp)
             data[time_str] = last_mins
