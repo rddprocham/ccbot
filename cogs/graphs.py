@@ -19,7 +19,15 @@ def graphs(time_str, time_int, time_description, time_unit):
                 data = json.load(f)
             
             last_mins = data[time_str]
-            last_mins.append(status.players.online)
+            if time_str == "60min":
+                last_mins.append(status.players.online)
+            elif time_str == "1h":
+                temp = 0
+                for i in range(60):
+                    temp += data["60min"][i]
+                temp /= 60
+                last_mins.append(temp)
+                print(temp)
             data[time_str] = last_mins
             if len(last_mins) > time_int:
                 last_mins.pop(0)
