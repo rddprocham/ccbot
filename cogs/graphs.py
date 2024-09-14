@@ -83,6 +83,8 @@ class Graphs(commands.Cog):
         graphs("60min", 60, "60 minutes", "Minutes")
         if self.graph_message_60s:
             await self.graph_message_60s.delete()
+        if self.graph_message_players:
+            await self.graph_message_players.delete()
         
         channel = self.bot.get_channel(CHANNEL)
         self.graph_message_60s = await channel.send(file=discord.File('plot_60min.png'))
