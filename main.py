@@ -10,7 +10,7 @@ load_dotenv()
 
 class StatusBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix='sta ', intents=discord.Intents().all())
+        super().__init__(command_prefix='ccb ', intents=discord.Intents().all())
 
     async def setup_hook(self):
         for filename in os.listdir("cogs"):
