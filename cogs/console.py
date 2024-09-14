@@ -122,13 +122,8 @@ class Console(commands.Cog):
 
             # Only print the changed lines if this isn't the first run
             if not self.first_run and changed_lines:
-                print(f"Number of changed lines: {len(changed_lines)}")
                 for index, line in changed_lines:
-                    # print(f"Line {index + 1}: {line}")
-                    try:
-                        await self.channel.send(f"`{line}`")
-                    except:
-                        pass
+                    await self.channel.send(f"`{line}`")
 
             self.previous_lines = current_lines
             self.first_run = False  # Set the flag to False after the first run

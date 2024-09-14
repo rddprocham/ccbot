@@ -28,15 +28,12 @@ def graphs(time_str, time_int, time_description, time_unit):
                 temp /= 60
                 temp = round(temp)
                 last_mins.append(temp)
-                print(temp)
             data[time_str] = last_mins
             if len(last_mins) > time_int:
                 last_mins.pop(0)
             
             with open("players_online.json", "w") as f:
                 json.dump(data, f, indent=4)
-            
-            print(last_mins)
 
             x = list(range(1, len(last_mins) + 1))
             y = last_mins

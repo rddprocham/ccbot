@@ -60,37 +60,37 @@ class Status(commands.Cog):
     #     # Send a confirmation message
     #     await ctx.send(f"Vous ne recevrez plus de notifications pendant {time_value}.")
 
-    # @commands.Cog.listener()
-    # async def on_ready(self):
-    #     guild = self.bot.get_guild(DISCORD_SERVER)
-    #     if guild is None:
-    #         print(f"Guild with ID {DISCORD_SERVER} not found.")
-    #         return
+    @commands.Cog.listener()
+    async def on_ready(self):
+        guild = self.bot.get_guild(DISCORD_SERVER)
+        if guild is None:
+            print(f"Guild with ID {DISCORD_SERVER} not found.")
+            return
         
-    #     channel = guild.get_channel(CHANNEL)
-    #     if channel is None:
-    #         print(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
-    #         return
+        channel = guild.get_channel(CHANNEL)
+        if channel is None:
+            print(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
+            return
         
-    #     embed = discord.Embed(title="Statut du serveur")
-    #     embed.add_field(name="IP",
-    #         value=os.getenv("MINECRAFT_SERVER"),
-    #         inline=False)
+        embed = discord.Embed(title="Statut du serveur")
+        embed.add_field(name="IP",
+            value=os.getenv("MINECRAFT_SERVER"),
+            inline=False)
                     
-    #     embed.add_field(name="Statut",
-    #         value=f"Chargement {emojis["loading"]}",
-    #         inline=False)
-    #     try:
-    #         # Fetch the first message in the channel
-    #         async for message in channel.history(limit=1, oldest_first=True):
-    #             self.msg = message
-    #             break
-    #         if self.msg is None:  # No messages in the channel
-    #             raise discord.NotFound
-    #     except:
-    #         self.msg = await channel.send(embed=embed)
+        embed.add_field(name="Statut",
+            value=f"Chargement {emojis["loading"]}",
+            inline=False)
+        try:
+            # Fetch the first message in the channel
+            async for message in channel.history(limit=1, oldest_first=True):
+                self.msg = message
+                break
+            if self.msg is None:  # No messages in the channel
+                raise discord.NotFound
+        except:
+            self.msg = await channel.send(embed=embed)
         
-    #     print("Message stored successfully.")
+        print("Message stored successfully.")
 
 
 
