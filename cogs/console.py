@@ -78,7 +78,7 @@ class Console(commands.Cog):
                     dm = await msg.author.create_dm()
                     await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Promise!\n-# Vous n'êtes pas {message.content}? Veuillez signaler ce problème au staff")
             
-            asyncio.sleep(3)
+            await asyncio.sleep(3)
             api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist reload")
 
         if message.channel.id!=CHANNEL:

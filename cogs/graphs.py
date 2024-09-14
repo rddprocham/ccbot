@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 import os
 import json
 
+import numpy as np
+import operator
+
 load_dotenv()
 
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
@@ -70,6 +73,7 @@ class Graphs(commands.Cog):
     
         self.graph_message_60s = await channel.send("En cours de création du graphique de 60s...")
         self.graph_message_1h = await channel.send("En cours de création du graphique de 1h...")
+        self.graph_message_players = await channel.send("En cours de création du graphique de joueurs...")
         self.min.start()
         self.hour.start()
     
@@ -82,6 +86,53 @@ class Graphs(commands.Cog):
         
         channel = self.bot.get_channel(CHANNEL)
         self.graph_message_60s = await channel.send(file=discord.File('plot_60min.png'))
+
+        with open("players_online.json", 'r') as f:
+            data = json.load(f)
+        
+        server = JavaServer.lookup(os.getenv("MINECRAFT_SERVER"))
+        query = server.query()
+
+        if query.players.names:
+            for player in query.players.names:
+                if player in data["players"]:
+                    data["players"][player] += 1
+                else:
+                    data["players"][player] = 1
+            print("Players online:", ", ".join(query.players.names))
+
+        with open("players_online.json", "w") as f:
+            json.dump(data, f, indent=4)
+        
+        with open("players_online.json", 'r') as f:
+            data = json.load(f)
+
+        fig, ax = plt.subplots()
+        # Access the "players" key
+        people_performance = data["players"]
+
+        # Sort the dictionary by performance in descending order and take the top 10 players
+        people_performance = dict(sorted(people_performance.items(), key=operator.itemgetter(1), reverse=True)[:10])
+
+        # Sorting the dictionary by performance (values) in descending order again
+        sorted_people = sorted(people_performance.items(), key=lambda x: x[1], reverse=True)
+
+        # Unpacking the sorted dictionary into two lists (names and performance)
+        people_sorted, performance_sorted = zip(*sorted_people)
+
+        y_pos = np.arange(len(people_sorted))
+
+        # Plotting the bar chart
+        ax.barh(y_pos, performance_sorted, align='center')
+        ax.set_yticks(y_pos, labels=people_sorted)
+        ax.invert_yaxis()  # labels read top-to-bottom
+        ax.set_xlabel('Minutes de jeu')
+        ax.set_title('Les 10 joueurs les plus actifs sur le serveur')
+
+        plt.savefig(f'plot_players.png')
+
+        channel = self.bot.get_channel(CHANNEL)
+        self.graph_message_players = await channel.send(file=discord.File('plot_players.png'))
     
     @tasks.loop(seconds=3600)
     async def hour(self):
@@ -92,8 +143,6 @@ class Graphs(commands.Cog):
         channel = self.bot.get_channel(CHANNEL)
         self.graph_message_1h = await channel.send(file=discord.File('plot_1h.png')) 
          
-
-    
 
     async def cog_load(self):
         print(f"{self.__class__.__name__} loaded!")
