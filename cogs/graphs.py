@@ -133,6 +133,8 @@ class Graphs(commands.Cog):
 
         plt.savefig(f'plot_players.png')
 
+        plt.clf()
+
         channel = self.bot.get_channel(CHANNEL)
         self.graph_message_players = await channel.send(file=discord.File('plot_players.png'))
     
