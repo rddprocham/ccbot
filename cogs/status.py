@@ -31,7 +31,7 @@ class Status(commands.Cog):
         self.count_to_stop = 0
     
     # @commands.command()
-    # async def no_notify(self, ctx, time_to_wait_num, time_to_wait_unit):
+    # async def no-notify(self, ctx, time_to_wait_num, time_to_wait_unit):
     #     options = {
     #          "s":1,
     #          "m":60,
@@ -78,7 +78,7 @@ class Status(commands.Cog):
             inline=False)
                     
         embed.add_field(name="Statut",
-            value=f"Chargement {emojis["loading"]}",
+            value=f"Chargement {emojis['loading']}",
             inline=False)
         try:
             # Fetch the first message in the channel
@@ -110,7 +110,7 @@ class Status(commands.Cog):
                                     value=os.getenv("MINECRAFT_SERVER"),
                                     inline=False)
                     embed.add_field(name="Statut",
-                                    value=f"En ligne {emojis["done"]}",
+                                    value=f"En ligne {emojis['done']}",
                                     inline=False)
                     embed.add_field(name="Ping",
                                     value=f"{round(status.latency)}ms",
@@ -132,7 +132,7 @@ class Status(commands.Cog):
                                     value=os.getenv("MINECRAFT_SERVER"),
                                     inline=False)
                     embed.add_field(name="Statut",
-                                    value=f"Hors-ligne {emojis["failed"]}",
+                                    value=f"Hors-ligne {emojis['failed']}",
                                     inline=False)
 
                     await self.msg.edit(embed=embed)
@@ -150,7 +150,7 @@ class Status(commands.Cog):
             if channel is None:
                 print(f"Channel with ID {ADMIN_CHANNEL} not found in guild {DISCORD_SERVER}.")
                 return
-            await channel.send(f"{emojis["failed"]} Il semblerait que le serveur soit hors-ligne! ||{os.getenv("ADMIN_ROLE_TO_PING")}||\n-Besoin de désactiver le message? Exécutez la commande .no-notify")
+            await channel.send(f"{emojis['failed']} Il semblerait que le serveur soit hors-ligne! ||{os.getenv('ADMIN_ROLE_TO_PING')}||\n-Besoin de désactiver le message? Exécutez la commande .no-notify")
 
     @send_message.before_loop
     @check_threshold.before_loop
