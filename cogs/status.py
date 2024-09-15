@@ -150,7 +150,7 @@ class Status(commands.Cog):
             if channel is None:
                 print(f"Channel with ID {ADMIN_CHANNEL} not found in guild {DISCORD_SERVER}.")
                 return
-            await channel.send(f"{emojis['failed']} Il semblerait que le serveur soit hors-ligne! ||{os.getenv('ADMIN_ROLE_TO_PING')}||\n-Besoin de désactiver le message? Exécutez la commande .no-notify")
+            await channel.send(f"{emojis['failed']} Il semblerait que le serveur soit hors-ligne! ||{os.getenv('ADMIN_ROLE_TO_PING')}||\n-#Besoin de désactiver le message? Exécutez la commande .no-notify")
 
     @send_message.before_loop
     @check_threshold.before_loop
