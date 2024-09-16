@@ -8,6 +8,7 @@ class Announcements(commands.Cog):
     @commands.command()
     async def say(self, ctx, *, what):
         await ctx.send(what)
+        await ctx.message.delete()
 
     async def cog_load(self):
         print(f"{self.__class__.__name__} loaded!")
