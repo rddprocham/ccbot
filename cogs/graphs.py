@@ -101,7 +101,6 @@ class Graphs(commands.Cog):
                     data["players"][player] += 1
                 else:
                     data["players"][player] = 1
-            print("Players online:", ", ".join(query.players.names))
 
         with open("players_online.json", "w") as f:
             json.dump(data, f, indent=4)
