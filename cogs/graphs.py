@@ -50,7 +50,7 @@ def graphs(time_str, time_int, time_description, time_unit):
 
             plt.savefig(f'plot_{time_str}.png')
 
-            plt.clf()
+            plt.close()
 
 
 
@@ -132,7 +132,7 @@ class Graphs(commands.Cog):
 
         plt.savefig(f'plot_players.png')
 
-        plt.clf()
+        plt.close()
 
         channel = self.bot.get_channel(CHANNEL)
         self.graph_message_players = await channel.send(file=discord.File('plot_players.png'))
