@@ -26,7 +26,7 @@ class Status(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_message.start()
-        self.check_threshold.start()
+        # self.check_threshold.start()
         self.msg = None
         self.count_to_stop = 0
     
@@ -138,22 +138,22 @@ class Status(commands.Cog):
                     await self.msg.edit(embed=embed)
                     self.count_to_stop += 1
 
-    @tasks.loop(seconds=5)
-    async def check_threshold(self):
-        if self.count_to_stop == THRESHOLD:
-            guild = self.bot.get_guild(DISCORD_SERVER)
-            if guild is None:
-                print(f"Guild with ID {DISCORD_SERVER} not found.")
-                return
+    # @tasks.loop(seconds=5)
+    # async def check_threshold(self):
+    #     if self.count_to_stop == THRESHOLD:
+    #         guild = self.bot.get_guild(DISCORD_SERVER)
+    #         if guild is None:
+    #             print(f"Guild with ID {DISCORD_SERVER} not found.")
+    #             return
             
-            channel = guild.get_channel(ADMIN_CHANNEL)
-            if channel is None:
-                print(f"Channel with ID {ADMIN_CHANNEL} not found in guild {DISCORD_SERVER}.")
-                return
-            await channel.send(f"{emojis['failed']} Il semblerait que le serveur soit hors-ligne! ||{os.getenv('ADMIN_ROLE_TO_PING')}||\n-#Besoin de désactiver le message? Exécutez la commande .no-notify")
+    #         channel = guild.get_channel(ADMIN_CHANNEL)
+    #         if channel is None:
+    #             print(f"Channel with ID {ADMIN_CHANNEL} not found in guild {DISCORD_SERVER}.")
+    #             return
+    #         await channel.send(f"{emojis['failed']} Il semblerait que le serveur soit hors-ligne! ||{os.getenv('ADMIN_ROLE_TO_PING')}||\n-#Besoin de désactiver le message? Exécutez la commande .no-notify")
 
     @send_message.before_loop
-    @check_threshold.before_loop
+    # @check_threshold.before_loop
     async def before_send_message(self):
         await self.bot.wait_until_ready()
 
