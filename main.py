@@ -20,4 +20,4 @@ class StatusBot(commands.Bot):
     async def on_ready(self):
         print("Bot is ready")
 
-StatusBot().run(os.getenv("DISCORD-BOT-TOKEN"))
+StatusBot().run(os.getenv("DISCORD_BOT_TOKEN"))
