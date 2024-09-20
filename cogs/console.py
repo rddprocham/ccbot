@@ -18,11 +18,19 @@ import asyncio
 load_dotenv()
 
 #Load admins
-with open("cadmins.json","r") as e:
-     json_cadmins = json.load(e)
-     cadmins = json_cadmins["cadmins"]
-     cloweradmins = json_cadmins["cloweradmins"]
-     clowerauth = json_cadmins["clowerauth"]
+try:
+    with open("cadmins.json","r") as e:
+        json_cadmins = json.load(e)
+        cadmins = json_cadmins["cadmins"]
+        cloweradmins = json_cadmins["cloweradmins"]
+        clowerauth = json_cadmins["clowerauth"]
+except FileNotFoundError:
+    cadmins = []
+    cloweradmins = []
+    clowerauth = []
+    with open("cadmins.json","w") as e:
+        json_cadmins = {"cadmins":cadmins,"cloweradmins":cloweradmins,"clowerauth":clowerauth}
+        json.dump(json_cadmins,e)
 
 
 with open("emojis.json","r") as f:

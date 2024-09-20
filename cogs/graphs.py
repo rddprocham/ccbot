@@ -17,9 +17,13 @@ CHANNEL = int(os.getenv("GRAPHS_CHANNEL"))
 def graphs(time_str, time_int, time_description, time_unit):
             server = JavaServer.lookup(os.getenv("MINECRAFT_SERVER"))
             status = server.status()
-
-            with open("players_online.json", 'r') as f:
-                data = json.load(f)
+            try:
+                with open("players_online.json", 'r') as f:
+                    data = json.load(f)
+            except FileNotFoundError:
+                data = {}
+            if time_str not in data:
+                data[time_str] = []
             
             last_mins = data[time_str]
             if time_str == "60min":
@@ -89,8 +93,13 @@ class Graphs(commands.Cog):
         channel = self.bot.get_channel(CHANNEL)
         self.graph_message_60s = await channel.send(file=discord.File('plot_60min.png'))
 
-        with open("players_online.json", 'r') as f:
-            data = json.load(f)
+        try:
+            with open("players_online.json", 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            data = {}
+        if "players" not in data:
+            data["players"] = {}
         
         server = JavaServer.lookup(os.getenv("MINECRAFT_SERVER"))
         query = server.query()
@@ -105,9 +114,12 @@ class Graphs(commands.Cog):
         with open("players_online.json", "w") as f:
             json.dump(data, f, indent=4)
         
-        with open("players_online.json", 'r') as f:
-            data = json.load(f)
-
+        try:
+            with open("players_online.json", 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            data = {}
+            
         fig, ax = plt.subplots()
         # Access the "players" key
         people_performance = data["players"]
