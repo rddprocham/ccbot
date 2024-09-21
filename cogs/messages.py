@@ -42,9 +42,11 @@ class Announcements(commands.Cog):
         category = self.bot.get_channel(int(os.getenv("DMS_CATEGORY")))
         if message.guild and message.channel.category != category:
             return
-        with open("dms.json", "r") as f:
-            data = json.load(f)
-        
+        try: 
+            with open("dms.json", "r") as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            data = {}
         #If the message is sent from the server
         if message.guild and message.channel.category == category:
             user = discord.utils.get(guild.members, id=data[str(message.channel.id)])
@@ -56,7 +58,18 @@ class Announcements(commands.Cog):
                     await dm.send(attachment.url)
         #If the message is sent from the DM
         if message.guild == None:
-            channel_to_send = self.bot.get_channel(data[str((message.author.id))])
+            #If a channel is already created 
+            if str(message.author.id) in data.keys():  
+                channel_to_send = self.bot.get_channel(data[str((message.author.id))])
+            else:
+            #If a channel is not created
+                guild = self.bot.get_guild(int(os.getenv("DISCORD_SERVER_ID")))
+                channel = await guild.create_text_channel(name=message.author.name, category=self.bot.get_channel(int(os.getenv("DMS_CATEGORY"))))
+                data[message.author.id] = channel.id
+                data[channel.id] = message.author.id
+                with open("dms.json", "w") as f:
+                    json.dump(data, f, indent=4)
+                channel_to_send = self.bot.get_channel(data[str((message.author.id))])
             if message.content:
                 await channel_to_send.send(message.content)
             if message.attachments:
