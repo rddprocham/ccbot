@@ -13,6 +13,11 @@ from scripts.pnicer import cogs_loaded
 
 load_dotenv("settings/.env")
 
+with open("settings/settings.json", 'r') as f:
+        settings = json.load(f)
+        with open("settings/settings.json", 'r') as f:
+            settings = json.load(f)
+
 class Presence(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -29,10 +34,11 @@ class Presence(commands.Cog):
                 self.count += 1
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{self.count} comptes en ligne sur le serveur discord"))
 
-        await asyncio.sleep(10)
-        self.server = JavaServer.lookup(os.getenv("MINECRAFT_SERVER"))
-        self.status = self.server.status()
-        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{self.status.players.online} joueur{'' if self.status.players.online == 1 else 's'} sur le serveur minecraft LTP"))
+        if settings["presence"]["disable_mc"] == False:
+            await asyncio.sleep(10)
+            self.server = JavaServer.lookup(os.getenv("MINECRAFT_SERVER"))
+            self.status = self.server.status()
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{self.status.players.online} joueur{'' if self.status.players.online == 1 else 's'} sur le serveur minecraft LTP"))
 
     @presence.before_loop
     async def before_presence(self):
@@ -42,9 +48,7 @@ class Presence(commands.Cog):
         cogs_loaded("Presence")
 
 async def setup(bot):
-    with open("settings/settings.json", 'r') as f:
-        settings = json.load(f)
-        if settings["disable_presence"] != True:
+        if settings["presence"]["disabled"] != True:
             await bot.add_cog(Presence(bot=bot))
         else:
             cogs_loaded("Presence", False)
