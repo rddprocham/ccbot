@@ -5,6 +5,8 @@ import os
 
 from dotenv import load_dotenv
 
+from scripts.pnicer import prefix
+
 #Load env variables
 load_dotenv("settings/.env")
 
@@ -18,6 +20,6 @@ class StatusBot(commands.Bot):
                 await self.load_extension(f'cogs.{filename[:-3]}')
 
     async def on_ready(self):
-        print("Bot is ready")
+        print(prefix("bot") + " Bot is ready!")
 
 StatusBot().run(os.getenv("DISCORD_BOT_TOKEN"))

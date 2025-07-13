@@ -9,6 +9,8 @@ import json
 import numpy as np
 import operator
 
+from scripts.pnicer import cogs_loaded
+
 load_dotenv("settings/.env")
 
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
@@ -160,7 +162,7 @@ class Graphs(commands.Cog):
          
 
     async def cog_load(self):
-        print(f"{self.__class__.__name__} loaded!")
+        cogs_loaded("Graphs")
 
 async def setup(bot):
     with open("settings/settings.json", 'r') as f:
@@ -168,4 +170,4 @@ async def setup(bot):
         if settings["disable_graphs"] != True:
             await bot.add_cog(Graphs(bot=bot))
         else:
-            print(f"Graphs disabled in settings, not loaded")
+            cogs_loaded("Graphs", False)

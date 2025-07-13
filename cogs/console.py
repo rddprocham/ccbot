@@ -13,6 +13,8 @@ import json
 
 import asyncio
 
+from scripts.pnicer import cogs_loaded
+
 
 #Load env variables
 load_dotenv("settings/.env")
@@ -147,7 +149,7 @@ class Console(commands.Cog):
         self.send_message.cancel()
 
     async def cog_load(self):
-        print(f"{self.__class__.__name__} loaded!")
+        cogs_loaded("Console")
 
 async def setup(bot):
      with open("settings/settings.json", 'r') as f:
@@ -155,6 +157,6 @@ async def setup(bot):
         if settings["disable_console"] != True:
             await bot.add_cog(Console(bot=bot))
         else:
-            print(f"Console disabled in settings, not loaded")
+            cogs_loaded("Console", False)
 
 

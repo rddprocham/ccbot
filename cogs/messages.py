@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 import json
 
+from scripts.pnicer import cogs_loaded
+
 load_dotenv("settings/.env")
 
 
@@ -77,7 +79,7 @@ class Announcements(commands.Cog):
                     await channel_to_send.send(attachment.url)
 
     async def cog_load(self):
-        print(f"{self.__class__.__name__} loaded!")
+        cogs_loaded("Announcements")
 
 async def setup(bot):
     with open("settings/settings.json", 'r') as f:
@@ -85,4 +87,4 @@ async def setup(bot):
         if settings["disable_announcements"] != True:
             await bot.add_cog(Announcements(bot=bot))
         else:
-            print(f"Announcements disabled in settings, not loaded")
+            cogs_loaded("Announcements", False)

@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+from scripts.pnicer import cogs_loaded
+
 class Tests(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -21,7 +23,7 @@ class Tests(commands.Cog):
         await dm.send(f"Pong! Bot latency is {round(self.bot.latency * 1000)}ms")
 
     async def cog_load(self):
-        print(f"{self.__class__.__name__} loaded!")
+        cogs_loaded("Tests")
 
 async def setup(bot):
     await bot.add_cog(Tests(bot=bot))

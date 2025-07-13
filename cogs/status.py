@@ -9,10 +9,12 @@ import json
 
 import datetime
 
+from scripts.pnicer import cogs_loaded
+
 THRESHOLD = 3
 
 #Load env variables
-load_dotenv("settings/.env")()
+load_dotenv("settings/.env")
 
 with open("emojis.json","r") as f:
      emojis = json.load(f)
@@ -159,7 +161,7 @@ class Status(commands.Cog):
 
         
     async def cog_load(self):
-        print(f"{self.__class__.__name__} loaded!")
+        cogs_loaded("Status")
 
 async def setup(bot):
      with open("settings/settings.json", 'r') as f:
@@ -167,6 +169,6 @@ async def setup(bot):
         if settings["disable_status"] != True:
             await bot.add_cog(Status(bot=bot))
         else:
-            print(f"Status disabled in settings, not loaded")
+            cogs_loaded("Status", False)
 
 

@@ -9,6 +9,8 @@ from mcstatus import JavaServer
 import os
 from dotenv import load_dotenv
 
+from scripts.pnicer import cogs_loaded
+
 load_dotenv("settings/.env")
 
 class Presence(commands.Cog):
@@ -37,7 +39,7 @@ class Presence(commands.Cog):
         await self.bot.wait_until_ready()
 
     async def cog_load(self):
-        print(f"{self.__class__.__name__} loaded!")
+        cogs_loaded("Presence")
 
 async def setup(bot):
     with open("settings/settings.json", 'r') as f:
@@ -45,4 +47,4 @@ async def setup(bot):
         if settings["disable_presence"] != True:
             await bot.add_cog(Presence(bot=bot))
         else:
-            print(f"Presence disabled in settings, not loaded")
+            cogs_loaded("Presence", False)
