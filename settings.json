@@ -1,0 +1,7 @@
+{
+    "disable_graphs":true,
+    "disable_console":true,
+    "disable_status":true,
+    "disable_presence":true,
+    "disable_announcements":true
+}

@@ -162,6 +162,11 @@ class Status(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-    await bot.add_cog(Status(bot=bot))
+     with open("settings.json", 'r') as f:
+        settings = json.load(f)
+        if settings["disable_status"] != True:
+            await bot.add_cog(Status(bot=bot))
+        else:
+            print(f"Status disabled in settings, not loaded")
 
 

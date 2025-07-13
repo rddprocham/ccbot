@@ -163,4 +163,9 @@ class Graphs(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-    await bot.add_cog(Graphs(bot=bot))
+    with open("settings.json", 'r') as f:
+        settings = json.load(f)
+        if settings["disable_graphs"] != True:
+            await bot.add_cog(Graphs(bot=bot))
+        else:
+            print(f"Graphs disabled in settings, not loaded")

@@ -150,6 +150,11 @@ class Console(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-    await bot.add_cog(Console(bot=bot))
+     with open("settings.json", 'r') as f:
+        settings = json.load(f)
+        if settings["disable_console"] != True:
+            await bot.add_cog(Console(bot=bot))
+        else:
+            print(f"Console disabled in settings, not loaded")
 
 

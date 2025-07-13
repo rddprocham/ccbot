@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands, tasks
 import asyncio
 
+import json
+
 from mcstatus import JavaServer
 
 import os
@@ -38,4 +40,9 @@ class Presence(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-    await bot.add_cog(Presence(bot=bot))
+    with open("settings.json", 'r') as f:
+        settings = json.load(f)
+        if settings["disable_presence"] != True:
+            await bot.add_cog(Presence(bot=bot))
+        else:
+            print(f"Presence disabled in settings, not loaded")
