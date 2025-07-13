@@ -12,7 +12,7 @@ import datetime
 THRESHOLD = 3
 
 #Load env variables
-load_dotenv()
+load_dotenv("settings/.env")()
 
 with open("emojis.json","r") as f:
      emojis = json.load(f)
@@ -162,7 +162,7 @@ class Status(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-     with open("settings.json", 'r') as f:
+     with open("settings/settings.json", 'r') as f:
         settings = json.load(f)
         if settings["disable_status"] != True:
             await bot.add_cog(Status(bot=bot))

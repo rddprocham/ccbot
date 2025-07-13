@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 #Load env variables
-load_dotenv()
+load_dotenv("settings/.env")
 
 class StatusBot(commands.Bot):
     def __init__(self):

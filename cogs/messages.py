@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 import json
 
-load_dotenv()
+load_dotenv("settings/.env")
 
 
 class Announcements(commands.Cog):
@@ -80,7 +80,7 @@ class Announcements(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-    with open("settings.json", 'r') as f:
+    with open("settings/settings.json", 'r') as f:
         settings = json.load(f)
         if settings["disable_announcements"] != True:
             await bot.add_cog(Announcements(bot=bot))

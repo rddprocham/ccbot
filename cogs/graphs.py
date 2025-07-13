@@ -9,7 +9,7 @@ import json
 import numpy as np
 import operator
 
-load_dotenv()
+load_dotenv("settings/.env")
 
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
 CHANNEL = int(os.getenv("GRAPHS_CHANNEL"))
@@ -163,7 +163,7 @@ class Graphs(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-    with open("settings.json", 'r') as f:
+    with open("settings/settings.json", 'r') as f:
         settings = json.load(f)
         if settings["disable_graphs"] != True:
             await bot.add_cog(Graphs(bot=bot))

@@ -15,11 +15,11 @@ import asyncio
 
 
 #Load env variables
-load_dotenv()
+load_dotenv("settings/.env")
 
 #Load admins
 try:
-    with open("cadmins.json","r") as e:
+    with open("settings/cadmins.json","r") as e:
         json_cadmins = json.load(e)
         cadmins = json_cadmins["cadmins"]
         cloweradmins = json_cadmins["cloweradmins"]
@@ -28,7 +28,7 @@ except FileNotFoundError:
     cadmins = []
     cloweradmins = []
     clowerauth = []
-    with open("cadmins.json","w") as e:
+    with open("settings/cadmins.json","w") as e:
         json_cadmins = {"cadmins":cadmins,"cloweradmins":cloweradmins,"clowerauth":clowerauth}
         json.dump(json_cadmins,e)
 
@@ -150,7 +150,7 @@ class Console(commands.Cog):
         print(f"{self.__class__.__name__} loaded!")
 
 async def setup(bot):
-     with open("settings.json", 'r') as f:
+     with open("settings/settings.json", 'r') as f:
         settings = json.load(f)
         if settings["disable_console"] != True:
             await bot.add_cog(Console(bot=bot))
