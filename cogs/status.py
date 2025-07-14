@@ -13,7 +13,6 @@ from scripts.pnicer import cogs_loaded
 
 THRESHOLD = 3
 
-#Load env variables
 load_dotenv("settings/.env")
 
 with open("emojis.json","r") as f:
@@ -28,40 +27,10 @@ class Status(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_message.start()
-        # self.check_threshold.start()
+        self.check_online.start()
         self.msg = None
         self.count_to_stop = 0
     
-    # @commands.command()
-    # async def no-notify(self, ctx, time_to_wait_num, time_to_wait_unit):
-    #     options = {
-    #          "s":1,
-    #          "m":60,
-    #          "h":3600,
-    #          "d":86400
-    #     }
-    #     options_str = {
-    #          "s":"secondes",
-    #          "m":"minutes",
-    #          "h":"heures",
-    #          "d":"jours"
-    #     }
-
-    #     time_value = time_to_wait_num * options[time_to_wait_unit]
-
-    #     time_now = datetime.datetime.now()
-
-    #     time_future = time_now 
-
-    #     timestamp = time_future.timestamp()
-    #     with open("no_notify.json", "w") as f:
-    #         json.dump({"time": timestamp}, f)
-
-        
-
-    #     # Send a confirmation message
-    #     await ctx.send(f"Vous ne recevrez plus de notifications pendant {time_value}.")
-
     @commands.Cog.listener()
     async def on_ready(self):
         guild = self.bot.get_guild(DISCORD_SERVER)
@@ -124,8 +93,6 @@ class Status(commands.Cog):
                                     value="1.20.6",
                                     inline=False)
 
-
-                # await channel.send(embed=embed)
                     await self.msg.edit(embed=embed)
                     self.count_to_stop = 0
         except Exception:
@@ -140,22 +107,22 @@ class Status(commands.Cog):
                     await self.msg.edit(embed=embed)
                     self.count_to_stop += 1
 
-    # @tasks.loop(seconds=5)
-    # async def check_threshold(self):
-    #     if self.count_to_stop == THRESHOLD:
-    #         guild = self.bot.get_guild(DISCORD_SERVER)
-    #         if guild is None:
-    #             print(f"Guild with ID {DISCORD_SERVER} not found.")
-    #             return
+    @tasks.loop(seconds=5)
+    async def check_online(self):
+        if self.count_to_stop == THRESHOLD:
+            guild = self.bot.get_guild(DISCORD_SERVER)
+            if guild is None:
+                print(f"Guild with ID {DISCORD_SERVER} not found.")
+                return
             
-    #         channel = guild.get_channel(ADMIN_CHANNEL)
-    #         if channel is None:
-    #             print(f"Channel with ID {ADMIN_CHANNEL} not found in guild {DISCORD_SERVER}.")
-    #             return
-    #         await channel.send(f"{emojis['failed']} Il semblerait que le serveur soit hors-ligne! ||{os.getenv('ADMIN_ROLE_TO_PING')}||\n-#Besoin de désactiver le message? Exécutez la commande .no-notify")
+            channel = guild.get_channel(ADMIN_CHANNEL)
+            if channel is None:
+                print(f"Channel with ID {ADMIN_CHANNEL} not found in guild {DISCORD_SERVER}.")
+                return
+            await channel.send(f"{emojis['failed']} Il semblerait que le serveur soit hors-ligne! ||{os.getenv('ADMIN_ROLE_TO_PING')}||\n-#Besoin de désactiver le message? Exécutez la commande .no-notify (disponible bientôt)")
 
     @send_message.before_loop
-    # @check_threshold.before_loop
+    @check_online.before_loop
     async def before_send_message(self):
         await self.bot.wait_until_ready()
 
