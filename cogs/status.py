@@ -9,7 +9,7 @@ import json
 
 import datetime
 
-from scripts.pnicer import cogs_loaded
+from scripts.pnicer import cogs_loaded, error
 
 THRESHOLD = 3
 
@@ -17,6 +17,9 @@ load_dotenv("settings/.env")
 
 with open("emojis.json","r") as f:
      emojis = json.load(f)
+
+with open("settings/settings.json", 'r') as f:
+    settings = json.load(f)
 
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
 CHANNEL = int(os.getenv("STATUS-CHANNEL"))
@@ -35,12 +38,12 @@ class Status(commands.Cog):
     async def on_ready(self):
         guild = self.bot.get_guild(DISCORD_SERVER)
         if guild is None:
-            print(f"Guild with ID {DISCORD_SERVER} not found.")
+            error(f"Guild with ID {DISCORD_SERVER} not found.")
             return
         
         channel = guild.get_channel(CHANNEL)
         if channel is None:
-            print(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
+            error(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
         
         embed = discord.Embed(title="Statut du serveur")
@@ -61,7 +64,7 @@ class Status(commands.Cog):
         except:
             self.msg = await channel.send(embed=embed)
         
-        print("Message stored successfully.")
+        cogs_loaded("Message stored successfully.", "r")
 
 
 
@@ -131,11 +134,9 @@ class Status(commands.Cog):
         cogs_loaded("Status")
 
 async def setup(bot):
-     with open("settings/settings.json", 'r') as f:
-        settings = json.load(f)
-        if settings["disable_status"] != True:
-            await bot.add_cog(Status(bot=bot))
-        else:
-            cogs_loaded("Status", False)
+    if settings["status"]["disabled"] != True:
+        await bot.add_cog(Status(bot=bot))
+    else:
+        cogs_loaded("Status", False)
 
 

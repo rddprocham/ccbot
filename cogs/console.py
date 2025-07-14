@@ -13,7 +13,7 @@ import json
 
 import asyncio
 
-from scripts.pnicer import cogs_loaded
+from scripts.pnicer import cogs_loaded, error
 
 load_dotenv("settings/.env")
 
@@ -52,22 +52,22 @@ class Console(commands.Cog):
     async def on_ready(self):
         self.guild = self.bot.get_guild(DISCORD_SERVER)
         if self.guild is None:
-            print(f"Guild with ID {DISCORD_SERVER} not found.")
+            error(f"Guild with ID {DISCORD_SERVER} not found.")
             return
         
         self.channel = self.guild.get_channel(CHANNEL)
         if self.channel is None:
-            print(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
+            error(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
         
         self.whitelist_channel = self.guild.get_channel(WHITELIST_CHANNEL)
         if self.channel is None:
-            print(f"Channel with ID {WHITELIST_CHANNEL} not found in guild {DISCORD_SERVER}.")
+            error(f"Channel with ID {WHITELIST_CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
         
         self.usernames_channel = self.guild.get_channel(USERNAMES_CHANNEL)
         if self.channel is None:
-            print(f"Channel with ID {USERNAMES_CHANNEL} not found in guild {DISCORD_SERVER}.")
+            error(f"Channel with ID {USERNAMES_CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
 
 
@@ -115,7 +115,7 @@ class Console(commands.Cog):
             if len(res_list)>5:
                 res_list.pop()
         except Exception as e:
-            print(f"Error fetching file contents: {e}")
+            error(f"Error fetching file contents: {e}")
 
         current_lines = [line.strip() for line in res_list] # Read all lines and strip whitespace
 

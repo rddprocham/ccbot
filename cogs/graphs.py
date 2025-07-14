@@ -9,7 +9,7 @@ import json
 import numpy as np
 import operator
 
-from scripts.pnicer import cogs_loaded
+from scripts.pnicer import cogs_loaded, error
 
 load_dotenv("settings/.env")
 
@@ -69,12 +69,12 @@ class Graphs(commands.Cog):
     async def on_ready(self):
         guild = self.bot.get_guild(DISCORD_SERVER)
         if guild is None:
-            print(f"Guild with ID {DISCORD_SERVER} not found.")
+            error(f"Guild with ID {DISCORD_SERVER} not found.")
             return
         
         channel = guild.get_channel(CHANNEL)
         if channel is None:
-            print(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
+            error(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
     
         self.graph_message_60s = await channel.send("En cours de création du graphique de 60s...")
