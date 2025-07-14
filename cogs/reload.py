@@ -7,7 +7,6 @@ class Reload(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #Ping command
     @commands.command(aliases = ['r'])
     async def reload(self, ctx, extension):
         await self.bot.reload_extension(f"cogs.{extension}")

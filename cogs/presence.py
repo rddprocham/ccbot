@@ -29,10 +29,11 @@ class Presence(commands.Cog):
         self.guild = self.bot.get_guild(int(os.getenv("DISCORD_SERVER")))
         self.count = 0
         
-        for member in self.guild.members:
-            if member.status != discord.Status.offline:
-                self.count += 1
-        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{self.count} comptes en ligne sur le serveur discord"))
+        if settings["presence"]["disable_dc"] == False:
+            for member in self.guild.members:
+                if member.status != discord.Status.offline:
+                    self.count += 1
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{self.count} comptes en ligne sur le serveur discord"))
 
         if settings["presence"]["disable_mc"] == False:
             await asyncio.sleep(10)

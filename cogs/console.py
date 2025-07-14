@@ -15,8 +15,6 @@ import asyncio
 
 from scripts.pnicer import cogs_loaded
 
-
-#Load env variables
 load_dotenv("settings/.env")
 
 #Load admins
