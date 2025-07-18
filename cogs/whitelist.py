@@ -70,35 +70,46 @@ class Whitelist(commands.Cog):
             print("failed at check channel")
             return
 
-        username = await usernames_channel.fetch_message(reaction.message_id)
+        username_message = await usernames_channel.fetch_message(reaction.message_id)
 
         if reaction.member.id not in whitelist_admins:
-            await username.remove_reaction(reaction.emoji.name, reaction.member)
+            await username_message.remove_reaction(reaction.emoji.name, reaction.member)
             print("failed at check author")
             return
         if reaction.emoji.name != "✅":
-            await username.remove_reaction(reaction.emoji.name, reaction.member)
+            await username_message.remove_reaction(reaction.emoji.name, reaction.member)
             print("failed at check name")
             return
-        if username.reactions[0].count > 1:
-            await username.remove_reaction(reaction.emoji.name, reaction.member)
+        if username_message.reactions[0].count > 1:
+            await username_message.remove_reaction(reaction.emoji.name, reaction.member)
             return
 
         print("correct reaction")
         print(reaction)
         try:
             print("add to console simulation")
-            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {username.content}")
+            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {username_message.content}")
         except HTTPError as err:
             if err.code == 412:
                 await whitelist_channel.send(f"`HTTP 412: Le serveur semble être éteint <@{reaction.member.id}>")
                 error("HTTP 412: Le serveur semble être éteint")
                 return
-        await whitelist_channel.send(f"Simulation: `{username.content}`/{f"<@{username.author.id}>"} a été ajouté à la whitelist")
+        await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été ajouté à la whitelist")
+
+        #Load discord-minecraft usernames
+        try:
+            with open("discord_minecraft_users.json","r") as e:
+                dmusers = json.load(e)
+        except FileNotFoundError:
+            dmusers = {}
+        dmusers[username_message.author.id] = username_message.content
+        with open("discord_minecraft_users.json","w") as e:
+            json_cadmins = {"dmusers":dmusers}
+            json.dump(json_cadmins,e)
         # async for msg in usernames_channel.history():
-        #     if msg.content == username.content:
+        #     if msg.content == username_message.content:
         #         dm = await msg.author.create_dm()
-        #         await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Oubliée!\n-# Vous n'êtes pas {username.content}? Veuillez signaler ce problème au staff")
+        #         await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Oubliée!\n-# Vous n'êtes pas {username_message.content}? Veuillez signaler ce problème au staff")
         
         await asyncio.sleep(3)
         await whitelist_channel.send(f"Simulation: `whitelist reload`")
@@ -112,22 +123,22 @@ class Whitelist(commands.Cog):
             print("failed at check channel")
             return
 
-        username = await usernames_channel.fetch_message(reaction.message_id)
-        
-        if username.reactions:
+        username_message = await usernames_channel.fetch_message(reaction.message_id)
+
+        if username_message.reactions:
             return
 
         if reaction.emoji.name == "✅":
             try:
                 print("remove from console simulation")
-                # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist remove {username.content}")
+                # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist remove {username_message.content}")
             except HTTPError as err:
                 if err.code == 412:
                     await whitelist_channel.send(f"`HTTP 412: Le serveur semble être éteint")
                     error("HTTP 412: Le serveur semble être éteint")
                     return
         
-        await whitelist_channel.send(f"Simulation: `{username.content}`/{f"<@{username.author.id}>"} a été retiré de la whitelist")
+        await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été retiré de la whitelist")
 
         await asyncio.sleep(3)
         await whitelist_channel.send(f"Simulation: `whitelist reload`")
