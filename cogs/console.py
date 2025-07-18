@@ -38,8 +38,6 @@ with open("emojis.json","r") as f:
 
 DISCORD_SERVER = int(os.getenv("DISCORD_SERVER"))
 CHANNEL = int(os.getenv("CONSOLE-CHANNEL"))
-WHITELIST_CHANNEL = int(os.getenv("WHITELIST_CHANNEL"))
-USERNAMES_CHANNEL = int(os.getenv("USERNAMES_CHANNEL"))
 
 class Console(commands.Cog):
     def __init__(self, bot):
@@ -57,19 +55,8 @@ class Console(commands.Cog):
         
         self.channel = self.guild.get_channel(CHANNEL)
         if self.channel is None:
-            error(f"Channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
+            error(f"Console channel with ID {CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
-        
-        self.whitelist_channel = self.guild.get_channel(WHITELIST_CHANNEL)
-        if self.channel is None:
-            error(f"Channel with ID {WHITELIST_CHANNEL} not found in guild {DISCORD_SERVER}.")
-            return
-        
-        self.usernames_channel = self.guild.get_channel(USERNAMES_CHANNEL)
-        if self.channel is None:
-            error(f"Channel with ID {USERNAMES_CHANNEL} not found in guild {DISCORD_SERVER}.")
-            return
-
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -77,18 +64,6 @@ class Console(commands.Cog):
         global api
         if message.author == self.bot.user:
             return
-
-        if message.channel == self.whitelist_channel:
-            api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
-            await message.channel.send(f"`{message.content}` a été ajouté à la whitelist")
-            async for msg in self.usernames_channel.history():
-                if msg.content == message.content:
-                    dm = await msg.author.create_dm()
-                    await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Promise!\n-# Vous n'êtes pas {message.content}? Veuillez signaler ce problème au staff")
-            
-            await asyncio.sleep(3)
-            api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist reload")
-
         if message.channel.id!=CHANNEL:
             return
         content = message.content
