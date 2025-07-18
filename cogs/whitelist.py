@@ -44,49 +44,56 @@ class Whitelist(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
+        global usernames_channel
+        global whitelist_channel
         self.guild = self.bot.get_guild(DISCORD_SERVER)
         if self.guild is None:
             error(f"Guild with ID {DISCORD_SERVER} not found.")
             return
         
-        self.whitelist_channel = self.guild.get_channel(WHITELIST_CHANNEL)
-        if self.whitelist_channel is None:
+        whitelist_channel = self.guild.get_channel(WHITELIST_CHANNEL)
+        if whitelist_channel is None:
             error(f"Whitelist channel with ID {WHITELIST_CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
         
-        self.usernames_channel = self.guild.get_channel(USERNAMES_CHANNEL)
-        if self.usernames_channel is None:
+        usernames_channel = self.guild.get_channel(USERNAMES_CHANNEL)
+        if usernames_channel is None:
             error(f"Usernames channel with ID {USERNAMES_CHANNEL} not found in guild {DISCORD_SERVER}.")
             return
 
-
     @commands.Cog.listener()
-    async def on_message(self, message):
-        global cadmins
-        global api
-        if message.author == self.bot.user:
+    async def on_raw_reaction_add(self, reaction):
+        global usernames_channel
+        global whitelist_channel
+        if reaction.channel_id != USERNAMES_CHANNEL:
+            print("failed at check channel")
             return
-
-        if message.channel == self.whitelist_channel:
-            if message.content.startswith("#"):
+        if reaction.member.id not in whitelist_admins:
+            print("failed at check author")
+            return
+        if reaction.emoji.name != "✅":
+            print("failed at check name")
+            return
+        print("correct reaction")
+        print(reaction)
+        username = await usernames_channel.fetch_message(reaction.message_id)
+        try:
+            print("add to console simulation")
+            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {username.content}")
+        except HTTPError as err:
+            if err.code == 412:
+                await whitelist_channel.send(f"`HTTP 412: Le serveur semble être éteint <@{reaction.member.id}>")
+                error("HTTP 412: Le serveur semble être éteint")
                 return
-            try:
-                # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {message.content}")
-                await message.channel.send(f"Simulation: ajout de {message.content} à la whitelist")
-            except HTTPError as err:
-                if err.code == 412:
-                    await message.channel.send(f"`HTTP 412: Le serveur semble être éteint")
-                    error("HTTP 412: Le serveur semble être éteint")
-                    return
-            await message.channel.send(f"`{message.content}` a été ajouté à la whitelist")
-            async for msg in self.usernames_channel.history():
-                if msg.content == message.content:
-                    dm = await msg.author.create_dm()
-                    await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Oubliée!\n-# Vous n'êtes pas {message.content}? Veuillez signaler ce problème au staff")
-            
-            await asyncio.sleep(3)
-            await message.channel.send(f"`Simulation: whitelist reload")
-            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist reload")
+        await whitelist_channel.send(f"Simulation: `{username.content}`/{f"<@{username.author.id}>"} a été ajouté à la whitelist")
+        async for msg in usernames_channel.history():
+            if msg.content == username.content:
+                dm = await msg.author.create_dm()
+                await dm.send(f"Vous avez bien été ajouté à la whitelist du serveur La Terre Oubliée!\n-# Vous n'êtes pas {username.content}? Veuillez signaler ce problème au staff")
+        
+        await asyncio.sleep(3)
+        await whitelist_channel.send(f"Simulation: `whitelist reload`")
+        # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist reload")
 
     async def cog_load(self):
         cogs_loaded("Whitelist")
@@ -98,5 +105,3 @@ async def setup(bot):
             await bot.add_cog(Whitelist(bot=bot))
         else:
             cogs_loaded("Whitelist", False)
-
-
