@@ -84,28 +84,38 @@ class Whitelist(commands.Cog):
             await username_message.remove_reaction(reaction.emoji.name, reaction.member)
             return
 
-        print("correct reaction")
-        print(reaction)
-        try:
-            print("add to console simulation")
-            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {username_message.content}")
-        except HTTPError as err:
-            if err.code == 412:
-                await whitelist_channel.send(f"`HTTP 412: Le serveur semble être éteint <@{reaction.member.id}>")
-                error("HTTP 412: Le serveur semble être éteint")
-                return
-        await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été ajouté à la whitelist")
-
         #Load discord-minecraft usernames
         try:
             with open("discord_minecraft_users.json","r") as e:
                 dmusers = json.load(e)
         except FileNotFoundError:
             dmusers = []
-        dmusers.append({"dc_usr":username_message.author.id,"mc_usr":username_message.content,"msg_id":username_message.id, "authorized":True})
+
+        already_exist = False
+        for i in range(len(dmusers)):
+            if dmusers[i]["dc_usr"] == username_message.author.id:
+                dmusers[i]["mc_usr"] = username_message.content
+                dmusers[i]["msg_id"] = username_message.id
+                dmusers[i]["authorized"] = True
+                already_exist = True
+                msg = await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été ajouté de nouveau validé.")
+
+        if not already_exist:
+            dmusers.append({"dc_usr":username_message.author.id,"mc_usr":username_message.content,"msg_id":username_message.id, "authorized":True})
+            msg = await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été ajouté à la whitelist")
         with open("discord_minecraft_users.json","w") as e:
-            json_cadmins = {"dmusers":dmusers}
+            json_cadmins = dmusers
             json.dump(json_cadmins,e)
+
+        try:
+            await msg.reply(f"Le joueur a correctement été ajouté au serveur <@{reaction.member.id}>")
+            # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist add {username_message.content}")
+        except HTTPError as err:
+            if err.code == 412:
+                await msg.reply(f"`HTTP 412: Le serveur semble être éteint <@{reaction.member.id}>")
+                error("HTTP 412: Le serveur semble être éteint")
+                return
+
         # async for msg in usernames_channel.history():
         #     if msg.content == username_message.content:
         #         dm = await msg.author.create_dm()
@@ -139,13 +149,14 @@ class Whitelist(commands.Cog):
             
             
             index = 0
-            for uid in dmusers["dmusers"]:
+            for uid in dmusers:
+                print(uid)
                 if uid["dc_usr"] == username_message.author.id:
 
                     msg = await whitelist_channel.send(f"Simulation: La validation de `{uid["mc_usr"]}`/{f"<@{uid["dc_usr"]}>"} a été retirée>")
-                    dmusers["dmusers"][index]["authorized"] = False
+                    dmusers[index]["authorized"] = False
                     with open("discord_minecraft_users.json","w") as e:
-                        json_cadmins = {"dmusers":dmusers}
+                        json_cadmins = dmusers
                         json.dump(json_cadmins,e)
 
                     try:
