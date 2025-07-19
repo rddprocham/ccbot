@@ -27,7 +27,7 @@ try:
 except FileNotFoundError:
     whitelist_admins = []
     with open("settings/cadmins.json","w") as e:
-        json_cadmins = {"whitelist-admins":whitelist_admins}
+        json_cadmins = whitelist_admins
         json.dump(json_cadmins,e)
 
 
@@ -67,18 +67,15 @@ class Whitelist(commands.Cog):
         global whitelist_channel
 
         if reaction.channel_id != USERNAMES_CHANNEL:
-            print("failed at check channel")
             return
 
         username_message = await usernames_channel.fetch_message(reaction.message_id)
 
         if reaction.member.id not in whitelist_admins:
             await username_message.remove_reaction(reaction.emoji.name, reaction.member)
-            print("failed at check author")
             return
         if reaction.emoji.name != "✅":
             await username_message.remove_reaction(reaction.emoji.name, reaction.member)
-            print("failed at check name")
             return
         if username_message.reactions[0].count > 1:
             await username_message.remove_reaction(reaction.emoji.name, reaction.member)
@@ -131,7 +128,6 @@ class Whitelist(commands.Cog):
         global whitelist_channel
 
         if reaction.channel_id != USERNAMES_CHANNEL:
-            print("failed at check channel")
             return
 
         username_message = await usernames_channel.fetch_message(reaction.message_id)
@@ -150,10 +146,9 @@ class Whitelist(commands.Cog):
             
             index = 0
             for uid in dmusers:
-                print(uid)
                 if uid["dc_usr"] == username_message.author.id:
 
-                    msg = await whitelist_channel.send(f"Simulation: La validation de `{uid["mc_usr"]}`/{f"<@{uid["dc_usr"]}>"} a été retirée>")
+                    msg = await whitelist_channel.send(f"Simulation: La validation de `{uid["mc_usr"]}`/{f"<@{uid["dc_usr"]}>"} a été retirée")
                     dmusers[index]["authorized"] = False
                     with open("discord_minecraft_users.json","w") as e:
                         json_cadmins = dmusers
@@ -179,7 +174,6 @@ class Whitelist(commands.Cog):
         global whitelist_channel
 
         if payload.channel_id != USERNAMES_CHANNEL:
-            print("failed at check channel")
             return
         
         try:
@@ -189,14 +183,11 @@ class Whitelist(commands.Cog):
             dmusers = []
 
         index = 0
-        for uid in dmusers["dmusers"]:
-            print(uid)
-            print(type(uid))
+        for uid in dmusers:
             if uid["msg_id"] == payload.message_id:
-                await whitelist_channel.send(f"Le message contenant le pseudo minecraft de `{uid["mc_usr"]}` / <@{uid["dc_usr"]}> a été supprimé, son accès à la whitelist a été automatiquement révoqué.")
-                dmusers["dmusers"][index]["authorized"] = False
+                dmusers[index]["authorized"] = False
                 with open("discord_minecraft_users.json","w") as e:
-                    json_cadmins = {"dmusers":dmusers}
+                    json_cadmins = dmusers
                     json.dump(json_cadmins,e)
                 
                 msg = await whitelist_channel.send(f"Simulation: Le message de `{uid["mc_usr"]}`/{f"<@{uid["dc_usr"]}>"} a été retiré de <#{USERNAMES_CHANNEL}>")
