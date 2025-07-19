@@ -95,7 +95,7 @@ class Whitelist(commands.Cog):
                 dmusers[i]["msg_id"] = username_message.id
                 dmusers[i]["authorized"] = True
                 already_exist = True
-                msg = await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été ajouté de nouveau validé.")
+                msg = await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été de nouveau validé.")
 
         if not already_exist:
             dmusers.append({"dc_usr":username_message.author.id,"mc_usr":username_message.content,"msg_id":username_message.id, "authorized":True})
