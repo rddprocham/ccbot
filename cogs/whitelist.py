@@ -102,7 +102,7 @@ class Whitelist(commands.Cog):
                 dmusers = json.load(e)
         except FileNotFoundError:
             dmusers = []
-        dmusers.append({"dc_usr":username_message.author.id,"mc_usr":username_message.content,"msg_id":username_message.id})
+        dmusers.append({"dc_usr":username_message.author.id,"mc_usr":username_message.content,"msg_id":username_message.id, "authorized":True})
         with open("discord_minecraft_users.json","w") as e:
             json_cadmins = {"dmusers":dmusers}
             json.dump(json_cadmins,e)
@@ -130,16 +130,33 @@ class Whitelist(commands.Cog):
             return
 
         if reaction.emoji.name == "✅":
+
             try:
-                print("remove from console simulation")
-                # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist remove {username_message.content}")
-            except HTTPError as err:
-                if err.code == 412:
-                    await whitelist_channel.send(f"`HTTP 412: Le serveur semble être éteint")
-                    error("HTTP 412: Le serveur semble être éteint")
-                    return
+                with open("discord_minecraft_users.json","r") as e:
+                    dmusers = json.load(e)
+            except FileNotFoundError:
+                dmusers = []
+            
+            
+            index = 0
+            for uid in dmusers["dmusers"]:
+                if uid["dc_usr"] == username_message.author.id:
+
+                    msg = await whitelist_channel.send(f"Simulation: La validation de `{uid["mc_usr"]}`/{f"<@{uid["dc_usr"]}>"} a été retirée>")
+                    dmusers["dmusers"][index]["authorized"] = False
+                    with open("discord_minecraft_users.json","w") as e:
+                        json_cadmins = {"dmusers":dmusers}
+                        json.dump(json_cadmins,e)
+
+                    try:
+                        # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist remove {username_message.content}")
+                        await msg.reply(f"Simulation: Ce joueur a été automatiquement retiré de la whitelist")
+                    except HTTPError as err:
+                        if err.code == 412:
+                            await msg.reply(f"HTTP 412: Le serveur semble être éteint: impossible de retirer automatiquement ce joueur de la whitelist")
+                            error("HTTP 412: Le serveur semble être éteint")
+                            return
         
-        await whitelist_channel.send(f"Simulation: `{username_message.content}`/{f"<@{username_message.author.id}>"} a été retiré de la whitelist")
 
         await asyncio.sleep(3)
         await whitelist_channel.send(f"Simulation: `whitelist reload`")
@@ -159,13 +176,34 @@ class Whitelist(commands.Cog):
                 dmusers = json.load(e)
         except FileNotFoundError:
             dmusers = []
-        
+
+        index = 0
         for uid in dmusers["dmusers"]:
             print(uid)
             print(type(uid))
             if uid["msg_id"] == payload.message_id:
-                await whitelist_channel.send(f"Le message contenant le pseudo minecraft de `{uid["mc_usr"]}` / <@{uid["dc_usr"]}> a été supprimé")
+                await whitelist_channel.send(f"Le message contenant le pseudo minecraft de `{uid["mc_usr"]}` / <@{uid["dc_usr"]}> a été supprimé, son accès à la whitelist a été automatiquement révoqué.")
+                dmusers["dmusers"][index]["authorized"] = False
+                with open("discord_minecraft_users.json","w") as e:
+                    json_cadmins = {"dmusers":dmusers}
+                    json.dump(json_cadmins,e)
+                
+                msg = await whitelist_channel.send(f"Simulation: Le message de `{uid["mc_usr"]}`/{f"<@{uid["dc_usr"]}>"} a été retiré de <#{USERNAMES_CHANNEL}>")
+
+                try:
+                    # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist remove {username_message.content}")
+                    await msg.reply(f"Simulation: Ce joueur a été automatiquement retiré de la whitelist")
+                except HTTPError as err:
+                    if err.code == 412:
+                        await msg.reply(f"`HTTP 412: Le serveur semble être éteint: impossible de retirer automatiquement ce joueur de la whitelist")
+                        error("HTTP 412: Le serveur semble être éteint")
+                        return
+                
+                await asyncio.sleep(3)
+                await whitelist_channel.send(f"Simulation: `whitelist reload`")
+
                 return
+            index += 1
         
     async def cog_load(self):
         cogs_loaded("Whitelist")
