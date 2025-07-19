@@ -101,8 +101,8 @@ class Whitelist(commands.Cog):
             with open("discord_minecraft_users.json","r") as e:
                 dmusers = json.load(e)
         except FileNotFoundError:
-            dmusers = {}
-        dmusers[username_message.author.id] = username_message.content
+            dmusers = []
+        dmusers.append({"dc_usr":username_message.author.id,"mc_usr":username_message.content,"msg_id":username_message.id})
         with open("discord_minecraft_users.json","w") as e:
             json_cadmins = {"dmusers":dmusers}
             json.dump(json_cadmins,e)
@@ -118,6 +118,7 @@ class Whitelist(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, reaction):
         global usernames_channel
+        global whitelist_channel
 
         if reaction.channel_id != USERNAMES_CHANNEL:
             print("failed at check channel")
@@ -143,6 +144,28 @@ class Whitelist(commands.Cog):
         await asyncio.sleep(3)
         await whitelist_channel.send(f"Simulation: `whitelist reload`")
         # api.client.servers.send_console_command(server_id=os.getenv("PTERODACTYL-SERVER"),cmd=f"whitelist reload")
+    
+    @commands.Cog.listener()
+    async def on_raw_message_delete(self, payload):
+        global usernames_channel
+        global whitelist_channel
+
+        if payload.channel_id != USERNAMES_CHANNEL:
+            print("failed at check channel")
+            return
+        
+        try:
+            with open("discord_minecraft_users.json","r") as e:
+                dmusers = json.load(e)
+        except FileNotFoundError:
+            dmusers = []
+        
+        for uid in dmusers["dmusers"]:
+            print(uid)
+            print(type(uid))
+            if uid["msg_id"] == payload.message_id:
+                await whitelist_channel.send(f"Le message contenant le pseudo minecraft de `{uid["mc_usr"]}` / <@{uid["dc_usr"]}> a été supprimé")
+                return
         
     async def cog_load(self):
         cogs_loaded("Whitelist")
